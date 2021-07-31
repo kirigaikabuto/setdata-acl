@@ -19,8 +19,8 @@ type userRoleService struct {
 	permStore     PermissionStore
 }
 
-func NewUserRoleService(s UserRoleStore) UserRoleService {
-	return &userRoleService{store: s}
+func NewUserRoleService(s UserRoleStore, r RolePermissionStore, p PermissionStore) UserRoleService {
+	return &userRoleService{store: s, rolePermStore: r, permStore: p}
 }
 
 func (u *userRoleService) CreateUserRole(cmd *CreateUserRoleCommand) (*UserRole, error) {
