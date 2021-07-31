@@ -9,13 +9,16 @@ type UserRoleService interface {
 	GetUserRole(cmd *GetUserRoleCommand) (*UserRole, error)
 	ListUserRole(cmd *ListUserRoleCommand) ([]UserRole, error)
 	DeleteUserRole(cmd *DeleteUserRoleCommand) error
+	GetUserRolePermissions(cmd *GetUserRolePermissionsCommand) (*GetUserRolePermissionsResponse, error)
 }
 
 type userRoleService struct {
-	store UserRoleStore
+	store         UserRoleStore
+	rolePermStore RolePermissionStore
+	permStore     PermissionStore
 }
 
-func NewUserRoleService(s UserRoleStore) UserRoleService{
+func NewUserRoleService(s UserRoleStore) UserRoleService {
 	return &userRoleService{store: s}
 }
 
@@ -36,4 +39,32 @@ func (u *userRoleService) ListUserRole(cmd *ListUserRoleCommand) ([]UserRole, er
 
 func (u *userRoleService) DeleteUserRole(cmd *DeleteUserRoleCommand) error {
 	return u.store.Delete(cmd.Id)
+}
+
+func (u *userRoleService) GetUserRolePermissions(cmd *GetUserRolePermissionsCommand) (*GetUserRolePermissionsResponse, error) {
+	response := &GetUserRolePermissionsResponse{UserId: cmd.UserId}
+	userRoles, err := u.store.List("", cmd.UserId)
+	if err != nil {
+		return nil, err
+	}
+	roles := []RolePermissionsResponse{}
+	for _, v := range userRoles {
+		role := RolePermissionsResponse{Role: v.RoleId}
+		rolePerms, err := u.rolePermStore.List(v.RoleId, "")
+		if err != nil {
+			return nil, err
+		}
+		perms := []Permission{}
+		for _, r := range rolePerms {
+			perm, err := u.permStore.Get(r.PermissionId)
+			if err != nil {
+				return nil, err
+			}
+			perms = append(perms, *perm)
+		}
+		role.Permissions = perms
+		roles = append(roles, role)
+	}
+	response.RolesPermissions = roles
+	return response, nil
 }

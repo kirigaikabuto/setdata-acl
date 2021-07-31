@@ -33,3 +33,21 @@ type DeleteUserRoleCommand struct {
 func (cmd *DeleteUserRoleCommand) Exec(service interface{}) (interface{}, error) {
 	return nil, service.(UserRoleService).DeleteUserRole(cmd)
 }
+
+type GetUserRolePermissionsCommand struct {
+	UserId string `json:"user_id"`
+}
+
+func (cmd *GetUserRolePermissionsCommand) Exec(service interface{}) (interface{}, error) {
+	return service.(UserRoleService).GetUserRolePermissions(cmd)
+}
+
+type RolePermissionsResponse struct {
+	Role        string       `json:"role_id"`
+	Permissions []Permission `json:"permissions"`
+}
+
+type GetUserRolePermissionsResponse struct {
+	UserId           string                    `json:"user_id"`
+	RolesPermissions []RolePermissionsResponse `json:"roles_permissions"`
+}
