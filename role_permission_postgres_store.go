@@ -6,7 +6,7 @@ import (
 )
 
 var rolePermissionPostgresQueries = []string{
-	`create table if not exists permissions(
+	`create table if not exists role_permissions(
 		id text,
 		role_id text,
 		permission_id text,
