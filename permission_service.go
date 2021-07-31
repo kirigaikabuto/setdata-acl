@@ -45,13 +45,17 @@ func (p *permissionService) DeletePermission(cmd *DeletePermissionCommand) error
 }
 
 func (p *permissionService) ListPermission(cmd *ListPermissionCommand) ([]Permission, error) {
-	_, err := setdata_common.GetAclResource(cmd.Resource)
-	if err != nil {
-		return nil, err
+	if cmd.Resource != "" {
+		_, err := setdata_common.GetAclResource(cmd.Resource)
+		if err != nil {
+			return nil, err
+		}
 	}
-	_, err = setdata_common.GetAclAction(cmd.Action)
-	if err != nil {
-		return nil, err
+	if cmd.Action != "" {
+		_, err := setdata_common.GetAclAction(cmd.Action)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return p.store.List(cmd.Resource, cmd.Action)
 }
