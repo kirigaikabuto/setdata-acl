@@ -20,6 +20,7 @@ func NewRolePermissionService(s RolePermissionStore) RolePermissionService {
 func (r *rolePermissionService) CreateRolePermission(cmd *CreateRolePermissionCommand) (*RolePermission, error) {
 	rolePermission := &RolePermission{Id: uuid.New().String()}
 	rolePermission.PermissionId = cmd.PermissionId
+	rolePermission.RoleId = cmd.RoleId
 	return r.store.Create(rolePermission)
 }
 
