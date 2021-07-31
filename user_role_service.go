@@ -1,6 +1,7 @@
 package setdata_acl
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -48,12 +49,14 @@ func (u *userRoleService) GetUserRolePermissions(cmd *GetUserRolePermissionsComm
 		return nil, err
 	}
 	roles := []RolePermissionsResponse{}
+	fmt.Println("userRoles ->", userRoles)
 	for _, v := range userRoles {
 		role := RolePermissionsResponse{Role: v.RoleId}
 		rolePerms, err := u.rolePermStore.List(v.RoleId, "")
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println("role", role, "userRoles ->", rolePerms)
 		perms := []Permission{}
 		for _, r := range rolePerms {
 			perm, err := u.permStore.Get(r.PermissionId)
