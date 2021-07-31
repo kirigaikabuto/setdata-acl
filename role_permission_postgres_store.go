@@ -53,7 +53,15 @@ func (r *rolePermissionStore) Create(rolePerm *RolePermission) (*RolePermission,
 }
 
 func (r *rolePermissionStore) Get(id string) (*RolePermission, error) {
-	return nil, nil
+	rolePermission := &RolePermission{}
+	query := "select id, role_id, permission_id from role_permissions where id = $1 limit 1"
+	err := r.db.QueryRow(query, id).Scan(&rolePermission.Id, &rolePermission.RoleId, &rolePermission.PermissionId)
+	if err == sql.ErrNoRows {
+		return nil, ErrRolePermissionNotFound
+	} else if err != nil {
+		return nil, err
+	}
+	return rolePermission, nil
 }
 
 func (r *rolePermissionStore) List(roleId, permissionId string) ([]RolePermission, error) {
@@ -61,5 +69,17 @@ func (r *rolePermissionStore) List(roleId, permissionId string) ([]RolePermissio
 }
 
 func (r *rolePermissionStore) Delete(id string) error {
+	query := "delete from role_permissions where id = $1"
+	result, err := r.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	n, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if n <= 0 {
+		return ErrRolePermissionNotFound
+	}
 	return nil
 }
