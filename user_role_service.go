@@ -15,6 +15,10 @@ type userRoleService struct {
 	store UserRoleStore
 }
 
+func NewUserRoleService(s UserRoleStore) UserRoleService{
+	return &userRoleService{store: s}
+}
+
 func (u *userRoleService) CreateUserRole(cmd *CreateUserRoleCommand) (*UserRole, error) {
 	userRole := &UserRole{Id: uuid.New().String()}
 	userRole.RoleId = cmd.RoleId
