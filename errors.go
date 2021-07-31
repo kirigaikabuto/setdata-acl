@@ -13,4 +13,6 @@ var (
 	ErrPermissionNotFound          = com.NewMiddleError(errors.New("permission not found"), 404, 54)
 	ErrCreateRolePermissionUnknown = com.NewMiddleError(errors.New("could not create role permission:unknown error"), 500, 55)
 	ErrRolePermissionNotFound      = com.NewMiddleError(errors.New("role permission not found"), 404, 56)
+	ErrCreateUserRoleUnknown       = com.NewMiddleError(errors.New("could not create user role:unknown error"), 500, 57)
+	ErrUserRoleNotFound            = com.NewMiddleError(errors.New("user role not found"), 404, 58)
 )

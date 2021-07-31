@@ -10,26 +10,15 @@ type RolePermissionService interface {
 }
 
 type rolePermissionService struct {
-	store           RolePermissionStore
-	roleStore       RoleStore
-	permissionStore PermissionStore
+	store RolePermissionStore
 }
 
-func NewRolePermissionService(s RolePermissionStore, r RoleStore, p PermissionStore) RolePermissionService {
-	return &rolePermissionService{store: s, roleStore: r, permissionStore: p}
+func NewRolePermissionService(s RolePermissionStore) RolePermissionService {
+	return &rolePermissionService{store: s}
 }
 
 func (r *rolePermissionService) CreateRolePermission(cmd *CreateRolePermissionCommand) (*RolePermission, error) {
 	rolePermission := &RolePermission{Id: uuid.New().String()}
-	_, err := r.roleStore.Get(cmd.RoleId)
-	if err != nil {
-		return nil, err
-	}
-	rolePermission.RoleId = cmd.RoleId
-	_, err = r.permissionStore.Get(cmd.PermissionId)
-	if err != nil {
-		return nil, err
-	}
 	rolePermission.PermissionId = cmd.PermissionId
 	return r.store.Create(rolePermission)
 }
