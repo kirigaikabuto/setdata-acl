@@ -2,7 +2,6 @@ package setdata_acl
 
 import (
 	"database/sql"
-	"errors"
 	_ "github.com/lib/pq"
 	"log"
 )
@@ -46,7 +45,7 @@ func (r *roleStore) Create(role *Role) (*Role, error) {
 		return nil, err
 	}
 	if n <= 0 {
-		return nil, errors.New("error during creating of role")
+		return nil, ErrCreateRoleUnknown
 	}
 	return role, nil
 }
@@ -62,7 +61,7 @@ func (r *roleStore) Delete(id string) error {
 		return err
 	}
 	if n <= 0 {
-		return errors.New("no role by this id")
+		return ErrRoleNotFound
 	}
 	return nil
 }
@@ -72,7 +71,7 @@ func (r *roleStore) Get(id string) (*Role, error) {
 	query := "select id, name from roles where id = $1 limit 1"
 	err := r.db.QueryRow(query, id).Scan(&role.Id, &role.Name)
 	if err == sql.ErrNoRows {
-		return nil, errors.New("no role by this id")
+		return nil, ErrRoleNotFound
 	} else if err != nil {
 		return nil, err
 	}
