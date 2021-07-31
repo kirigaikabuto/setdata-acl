@@ -37,7 +37,19 @@ func NewPostgresRolePermissionStore(cfg PostgresConfig) (RolePermissionStore, er
 }
 
 func (r *rolePermissionStore) Create(rolePerm *RolePermission) (*RolePermission, error) {
-	return nil, nil
+	query := "insert into role_permissions (id, role_id, permission_id) values ($1, $2, $3)"
+	result, err := r.db.Exec(query, rolePerm.Id, rolePerm.RoleId, rolePerm.PermissionId)
+	if err != nil {
+		return nil, err
+	}
+	n, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if n <= 0 {
+		return nil, ErrCreateRolePermissionUnknown
+	}
+	return rolePerm, nil
 }
 
 func (r *rolePermissionStore) Get(id string) (*RolePermission, error) {
