@@ -3,6 +3,7 @@ package setdata_acl
 import (
 	"database/sql"
 	"log"
+	"strconv"
 )
 
 var rolePermissionPostgresQueries = []string{
@@ -65,7 +66,38 @@ func (r *rolePermissionStore) Get(id string) (*RolePermission, error) {
 }
 
 func (r *rolePermissionStore) List(roleId, permissionId string) ([]RolePermission, error) {
-	return nil, nil
+	rolePermissions := []RolePermission{}
+	query := "select id, role_id, permission_id from role_permissions "
+	var values []interface{}
+	cnt := 1
+	if roleId != "" {
+		query = query + "where role_id = $" + strconv.Itoa(cnt)
+		values = append(values, roleId)
+		cnt += 1
+		if permissionId != "" {
+			query = query + "and permission_id = $" + strconv.Itoa(cnt)
+			values = append(values, permissionId)
+			cnt += 1
+		}
+	} else if permissionId != "" {
+		query = query + "where permission_id = $" + strconv.Itoa(cnt)
+		values = append(values, permissionId)
+		cnt += 1
+	}
+	rows, err := r.db.Query(query, values...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		item := RolePermission{}
+		err = rows.Scan(&item.Id, &item.RoleId, &item.PermissionId)
+		if err != nil {
+			return nil, err
+		}
+		rolePermissions = append(rolePermissions, item)
+	}
+	return rolePermissions, nil
 }
 
 func (r *rolePermissionStore) Delete(id string) error {
